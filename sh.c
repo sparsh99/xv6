@@ -137,7 +137,34 @@ getcmd(char *buf, int nbuf)
   memset(buf, 0, nbuf);
   gets(buf, nbuf);
   if(buf[0] == 0) // EOF
-    return -1;
+    return -1; 
+
+  //history storing
+  char his[120];
+  his[0]='e';
+  his[1]='c';
+  his[2]='h';
+  his[3]='o';
+  his[4]=' ';
+  his[5]='?';
+  int i=0;
+  printf(1,"strlen: %d\n",strlen(buf));
+  while(i<strlen(buf)){
+	his[i+6]=buf[i];
+	i++;
+  }
+  int x=strlen(buf)+5;
+  his[x]='?';
+  his[x+1]=' ';
+  his[x+2]='>';
+  his[x+3]='>';
+  his[x+4]=' ';
+  his[x+5]='h';
+  his[x+6]=0;
+  printf(1,"History Added: %s\n",his);
+  if(fork1() == 0)
+ 	runcmd(parsecmd(his));
+  wait();
   return 0;
 }
 
@@ -146,7 +173,21 @@ main(void)
 {
   static char buf[100];
   int fd;
-  
+
+  char his[50];
+  his[0]='e';
+  his[1]='c';
+  his[2]='h';
+  his[3]='o';
+  his[4]=' ';
+  his[5]='>';
+  his[6]=' ';
+  his[7]='h';
+  his[8]=0;
+  if(fork1() == 0)
+ 	runcmd(parsecmd(his));
+  wait();
+
   // Assumes three file descriptors open.
   while((fd = open("console", O_RDWR)) >= 0){
     if(fd >= 3){

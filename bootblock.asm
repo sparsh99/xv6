@@ -60,7 +60,7 @@ seta20.2:
   # effective memory map doesn't change during the transition.
   lgdt    gdtdesc
     7c1d:	0f 01 16             	lgdtl  (%esi)
-    7c20:	78 7c                	js     7c9e <read1sect+0xe>
+    7c20:	78 7c                	js     7c9e <readsect+0xe>
   movl    %cr0, %eax
     7c22:	0f 20 c0             	mov    %cr0,%eax
   orl     $CR0_PE, %eax
@@ -88,7 +88,7 @@ start32:
     7c37:	8e c0                	mov    %eax,%es
   movw    %ax, %ss                # -> SS: Stack Segment
     7c39:	8e d0                	mov    %eax,%ss
-  movw    $0, %ax                 # Zero segments not read1y for use
+  movw    $0, %ax                 # Zero segments not ready for use
     7c3b:	66 b8 00 00          	mov    $0x0,%ax
   movw    %ax, %fs                # -> FS
     7c3f:	8e e0                	mov    %eax,%fs
@@ -150,7 +150,7 @@ inb(ushort port)
   asm volatile("in %1,%0" : "=a" (data) : "d" (port));
     7c81:	ba f7 01 00 00       	mov    $0x1f7,%edx
     7c86:	ec                   	in     (%dx),%al
-  // Wait for disk read1y.
+  // Wait for disk ready.
   while((inb(0x1F7) & 0xC0) != 0x40)
     7c87:	83 e0 c0             	and    $0xffffffc0,%eax
     7c8a:	3c 40                	cmp    $0x40,%al
@@ -160,11 +160,11 @@ inb(ushort port)
     7c8e:	5d                   	pop    %ebp
     7c8f:	c3                   	ret    
 
-00007c90 <read1sect>:
+00007c90 <readsect>:
 
 // Read a single sector at offset into dst.
 void
-read1sect(void *dst, uint offset)
+readsect(void *dst, uint offset)
 {
     7c90:	55                   	push   %ebp
     7c91:	89 e5                	mov    %esp,%ebp
@@ -204,7 +204,7 @@ outb(ushort port, uchar data)
     7cde:	ee                   	out    %al,(%dx)
   outb(0x1F5, offset >> 16);
   outb(0x1F6, (offset >> 24) | 0xE0);
-  outb(0x1F7, 0x20);  // cmd 0x20 - read1 sectors
+  outb(0x1F7, 0x20);  // cmd 0x20 - read sectors
 
   // Read data.
   waitdisk();
@@ -227,12 +227,12 @@ insl(int port, void *addr, int cnt)
     7cf6:	5d                   	pop    %ebp
     7cf7:	c3                   	ret    
 
-00007cf8 <read1seg>:
+00007cf8 <readseg>:
 
 // Read 'count' bytes at 'offset' from kernel into physical address 'pa'.
 // Might copy more than asked.
 void
-read1seg(uchar* pa, uint count, uint offset)
+readseg(uchar* pa, uint count, uint offset)
 {
     7cf8:	55                   	push   %ebp
     7cf9:	89 e5                	mov    %esp,%ebp
@@ -258,28 +258,28 @@ read1seg(uchar* pa, uint count, uint offset)
     7d12:	c1 ee 09             	shr    $0x9,%esi
     7d15:	83 c6 01             	add    $0x1,%esi
 
-  // If this is too slow, we could read1 lots of sectors at a time.
-  // We'd write1 more to memory than asked, but it doesn't matter --
+  // If this is too slow, we could read lots of sectors at a time.
+  // We'd write more to memory than asked, but it doesn't matter --
   // we load in increasing order.
   for(; pa < epa; pa += SECTSIZE, offset++)
     7d18:	39 df                	cmp    %ebx,%edi
-    7d1a:	76 17                	jbe    7d33 <read1seg+0x3b>
-    read1sect(pa, offset);
+    7d1a:	76 17                	jbe    7d33 <readseg+0x3b>
+    readsect(pa, offset);
     7d1c:	56                   	push   %esi
     7d1d:	53                   	push   %ebx
-    7d1e:	e8 6d ff ff ff       	call   7c90 <read1sect>
+    7d1e:	e8 6d ff ff ff       	call   7c90 <readsect>
   offset = (offset / SECTSIZE) + 1;
 
-  // If this is too slow, we could read1 lots of sectors at a time.
-  // We'd write1 more to memory than asked, but it doesn't matter --
+  // If this is too slow, we could read lots of sectors at a time.
+  // We'd write more to memory than asked, but it doesn't matter --
   // we load in increasing order.
   for(; pa < epa; pa += SECTSIZE, offset++)
     7d23:	81 c3 00 02 00 00    	add    $0x200,%ebx
     7d29:	83 c6 01             	add    $0x1,%esi
     7d2c:	83 c4 08             	add    $0x8,%esp
     7d2f:	39 df                	cmp    %ebx,%edi
-    7d31:	77 e9                	ja     7d1c <read1seg+0x24>
-    read1sect(pa, offset);
+    7d31:	77 e9                	ja     7d1c <readseg+0x24>
+    readsect(pa, offset);
 }
     7d33:	8d 65 f4             	lea    -0xc(%ebp),%esp
     7d36:	5b                   	pop    %ebx
@@ -290,7 +290,7 @@ read1seg(uchar* pa, uint count, uint offset)
 
 00007d3b <bootmain>:
 
-void read1seg(uchar*, uint, uint);
+void readseg(uchar*, uint, uint);
 
 void
 bootmain(void)
@@ -306,11 +306,11 @@ bootmain(void)
   elf = (struct elfhdr*)0x10000;  // scratch space
 
   // Read 1st page off disk
-  read1seg((uchar*)elf, 4096, 0);
+  readseg((uchar*)elf, 4096, 0);
     7d44:	6a 00                	push   $0x0
     7d46:	68 00 10 00 00       	push   $0x1000
     7d4b:	68 00 00 01 00       	push   $0x10000
-    7d50:	e8 a3 ff ff ff       	call   7cf8 <read1seg>
+    7d50:	e8 a3 ff ff ff       	call   7cf8 <readseg>
 
   // Is this an ELF executable?
   if(elf->magic != ELF_MAGIC)
@@ -333,11 +333,11 @@ bootmain(void)
     7d7d:	73 2f                	jae    7dae <bootmain+0x73>
     pa = (uchar*)ph->paddr;
     7d7f:	8b 7b 0c             	mov    0xc(%ebx),%edi
-    read1seg(pa, ph->filesz, ph->off);
+    readseg(pa, ph->filesz, ph->off);
     7d82:	ff 73 04             	pushl  0x4(%ebx)
     7d85:	ff 73 10             	pushl  0x10(%ebx)
     7d88:	57                   	push   %edi
-    7d89:	e8 6a ff ff ff       	call   7cf8 <read1seg>
+    7d89:	e8 6a ff ff ff       	call   7cf8 <readseg>
     if(ph->memsz > ph->filesz)
     7d8e:	8b 4b 14             	mov    0x14(%ebx),%ecx
     7d91:	8b 43 10             	mov    0x10(%ebx),%eax

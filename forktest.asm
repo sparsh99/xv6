@@ -4,17 +4,17 @@ _forktest:     file format elf32-i386
 
 Disassembly of section .text:
 
-00000000 <printf1>:
+00000000 <printf>:
 
 #define N  1000
 
 void
-printf1(int fd, char *s, ...)
+printf(int fd, char *s, ...)
 {
    0:	55                   	push   %ebp
    1:	89 e5                	mov    %esp,%ebp
    3:	83 ec 08             	sub    $0x8,%esp
-  write1(fd, s, strlen(s));
+  write(fd, s, strlen(s));
    6:	83 ec 0c             	sub    $0xc,%esp
    9:	ff 75 0c             	pushl  0xc(%ebp)
    c:	e8 97 01 00 00       	call   1a8 <strlen>
@@ -23,7 +23,7 @@ printf1(int fd, char *s, ...)
   17:	50                   	push   %eax
   18:	ff 75 0c             	pushl  0xc(%ebp)
   1b:	ff 75 08             	pushl  0x8(%ebp)
-  1e:	e8 67 03 00 00       	call   38a <write1>
+  1e:	e8 67 03 00 00       	call   38a <write>
   23:	83 c4 10             	add    $0x10,%esp
 }
   26:	90                   	nop
@@ -40,11 +40,11 @@ forktest(void)
   2c:	83 ec 18             	sub    $0x18,%esp
   int n, pid;
 
-  printf1(1, "fork test\n");
+  printf(1, "fork test\n");
   2f:	83 ec 08             	sub    $0x8,%esp
   32:	68 0c 04 00 00       	push   $0x40c
   37:	6a 01                	push   $0x1
-  39:	e8 c2 ff ff ff       	call   0 <printf1>
+  39:	e8 c2 ff ff ff       	call   0 <printf>
   3e:	83 c4 10             	add    $0x10,%esp
 
   for(n=0; n<N; n++){
@@ -65,7 +65,7 @@ forktest(void)
 {
   int n, pid;
 
-  printf1(1, "fork test\n");
+  printf(1, "fork test\n");
 
   for(n=0; n<N; n++){
   63:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
@@ -83,12 +83,12 @@ forktest(void)
   if(n == N){
   73:	81 7d f4 e8 03 00 00 	cmpl   $0x3e8,-0xc(%ebp)
   7a:	75 40                	jne    bc <forktest+0x93>
-    printf1(1, "fork claimed to work N times!\n", N);
+    printf(1, "fork claimed to work N times!\n", N);
   7c:	83 ec 04             	sub    $0x4,%esp
   7f:	68 e8 03 00 00       	push   $0x3e8
   84:	68 18 04 00 00       	push   $0x418
   89:	6a 01                	push   $0x1
-  8b:	e8 70 ff ff ff       	call   0 <printf1>
+  8b:	e8 70 ff ff ff       	call   0 <printf>
   90:	83 c4 10             	add    $0x10,%esp
     exit();
   93:	e8 d2 02 00 00       	call   36a <exit>
@@ -99,16 +99,16 @@ forktest(void)
   98:	e8 d5 02 00 00       	call   372 <wait>
   9d:	85 c0                	test   %eax,%eax
   9f:	79 17                	jns    b8 <forktest+0x8f>
-      printf1(1, "wait stopped early\n");
+      printf(1, "wait stopped early\n");
   a1:	83 ec 08             	sub    $0x8,%esp
   a4:	68 37 04 00 00       	push   $0x437
   a9:	6a 01                	push   $0x1
-  ab:	e8 50 ff ff ff       	call   0 <printf1>
+  ab:	e8 50 ff ff ff       	call   0 <printf>
   b0:	83 c4 10             	add    $0x10,%esp
       exit();
   b3:	e8 b2 02 00 00       	call   36a <exit>
   if(n == N){
-    printf1(1, "fork claimed to work N times!\n", N);
+    printf(1, "fork claimed to work N times!\n", N);
     exit();
   }
   
@@ -116,7 +116,7 @@ forktest(void)
   b8:	83 6d f4 01          	subl   $0x1,-0xc(%ebp)
   bc:	83 7d f4 00          	cmpl   $0x0,-0xc(%ebp)
   c0:	7f d6                	jg     98 <forktest+0x6f>
-      printf1(1, "wait stopped early\n");
+      printf(1, "wait stopped early\n");
       exit();
     }
   }
@@ -125,21 +125,21 @@ forktest(void)
   c2:	e8 ab 02 00 00       	call   372 <wait>
   c7:	83 f8 ff             	cmp    $0xffffffff,%eax
   ca:	74 17                	je     e3 <forktest+0xba>
-    printf1(1, "wait got too many\n");
+    printf(1, "wait got too many\n");
   cc:	83 ec 08             	sub    $0x8,%esp
   cf:	68 4b 04 00 00       	push   $0x44b
   d4:	6a 01                	push   $0x1
-  d6:	e8 25 ff ff ff       	call   0 <printf1>
+  d6:	e8 25 ff ff ff       	call   0 <printf>
   db:	83 c4 10             	add    $0x10,%esp
     exit();
   de:	e8 87 02 00 00       	call   36a <exit>
   }
   
-  printf1(1, "fork test OK\n");
+  printf(1, "fork test OK\n");
   e3:	83 ec 08             	sub    $0x8,%esp
   e6:	68 5e 04 00 00       	push   $0x45e
   eb:	6a 01                	push   $0x1
-  ed:	e8 0e ff ff ff       	call   0 <printf1>
+  ed:	e8 0e ff ff ff       	call   0 <printf>
   f2:	83 c4 10             	add    $0x10,%esp
 }
   f5:	90                   	nop
@@ -374,13 +374,13 @@ gets(char *buf, int max)
   for(i=0; i+1 < max; ){
  222:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
  229:	eb 42                	jmp    26d <gets+0x51>
-    cc = read1(0, &c, 1);
+    cc = read(0, &c, 1);
  22b:	83 ec 04             	sub    $0x4,%esp
  22e:	6a 01                	push   $0x1
  230:	8d 45 ef             	lea    -0x11(%ebp),%eax
  233:	50                   	push   %eax
  234:	6a 00                	push   $0x0
- 236:	e8 47 01 00 00       	call   382 <read1>
+ 236:	e8 47 01 00 00       	call   382 <read>
  23b:	83 c4 10             	add    $0x10,%esp
  23e:	89 45 f0             	mov    %eax,-0x10(%ebp)
     if(cc < 1)
@@ -414,7 +414,7 @@ gets(char *buf, int max)
  273:	3b 45 0c             	cmp    0xc(%ebp),%eax
  276:	7c b3                	jl     22b <gets+0xf>
  278:	eb 01                	jmp    27b <gets+0x5f>
-    cc = read1(0, &c, 1);
+    cc = read(0, &c, 1);
     if(cc < 1)
       break;
  27a:	90                   	nop
@@ -599,14 +599,14 @@ SYSCALL(pipe)
  37f:	cd 40                	int    $0x40
  381:	c3                   	ret    
 
-00000382 <read1>:
-SYSCALL(read1)
+00000382 <read>:
+SYSCALL(read)
  382:	b8 05 00 00 00       	mov    $0x5,%eax
  387:	cd 40                	int    $0x40
  389:	c3                   	ret    
 
-0000038a <write1>:
-SYSCALL(write1)
+0000038a <write>:
+SYSCALL(write)
  38a:	b8 10 00 00 00       	mov    $0x10,%eax
  38f:	cd 40                	int    $0x40
  391:	c3                   	ret    
@@ -683,8 +683,8 @@ SYSCALL(getpid)
  3ef:	cd 40                	int    $0x40
  3f1:	c3                   	ret    
 
-000003f2 <sbrk1>:
-SYSCALL(sbrk1)
+000003f2 <sbrk>:
+SYSCALL(sbrk)
  3f2:	b8 0c 00 00 00       	mov    $0xc,%eax
  3f7:	cd 40                	int    $0x40
  3f9:	c3                   	ret    
