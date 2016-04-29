@@ -130,6 +130,18 @@ runcmd(struct cmd *cmd)
   exit();
 }
 
+int cmdCheck(char *buf){
+	char hi[]={'h','i','s','t','o','r','y','\0'};
+	int i=0;
+	if(strlen(buf)==0) return 0;
+	if(strlen(buf)==1 && buf[0]=='\n') return 0;
+	while(i<strlen(hi))
+	{	if(buf[i]!=hi[i]) return 1;
+		i++;
+	}
+	return 0;
+}
+
 int
 getcmd(char *buf, int nbuf)
 {
@@ -140,7 +152,7 @@ getcmd(char *buf, int nbuf)
     return -1; 
 
   //history storing
-  char his[120];
+/*  char his[120];
   his[0]='e';
   his[1]='c';
   his[2]='h';
@@ -165,6 +177,13 @@ getcmd(char *buf, int nbuf)
   if(fork1() == 0)
  	runcmd(parsecmd(his));
   wait();
+*/
+  if(cmdCheck(buf)) 
+  {	historyAdd(buf);
+	//printf(1,"added\n");
+  }else{
+	//printf(1,"not added\n");
+  }
   return 0;
 }
 
@@ -190,6 +209,7 @@ main(void)
 
   // Assumes three file descriptors open.
   while((fd = open("console", O_RDWR)) >= 0){
+
     if(fd >= 3){
       close(fd);
       break;
@@ -198,6 +218,7 @@ main(void)
   
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
+
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
       // Clumsy but will have to do for now.
       // Chdir has no effect on the parent if run in the child.

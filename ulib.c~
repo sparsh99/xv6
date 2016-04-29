@@ -104,53 +104,6 @@ memmove(void *vdst, void *vsrc, int n)
   return vdst;
 }
 
-void
-historyAdd(char *buf1){
-
-     int fd;
-     char hist[10]={'h','\0'};
-     //printf(1,"here\n");
-     char buf[1000],buf2[1000];
-
-     if((fd = open(hist, 0)) < 0){
-       printf(1, "History: cannot open %s\n", hist);
-       exit();
-     }
-
-     int i=0;
-     while(buf1[i]!=0)
-     { 	//printf(1,"%d has %d\n",i,buf1[i]);
-	buf[i]=buf1[i]; 
-	i++;
-     }
-	buf[i]=0;	
-    // int n;
-     while((read(fd, buf2, 1000)) > 0){
-    	//write(1, buf, n);
-	//buf[1001]=0;
-	//int i=0;
+void addHistory(char *buf){
 	
-	//printf(1,"%d %d\n",strlen(buf),strlen(buf2));
-	
-	while(i<strlen(buf2)+strlen(buf1)){
-		//printf(1,"%c\n",buf2[i]);
-		buf[i]=buf2[i-strlen(buf1)];
-		i++;
-	}
-	
-	//printf(1,"strlen: %d %s\n",strlen(buf),buf);	
-     }
-     //history(fd);
-     close(fd);
-
-     if((fd = open(hist,O_CREATE|O_RDWR)) < 0){
-       printf(1, "History: cannot open %s\n", hist);
-       exit();
-     }
-	
-     if(write(fd, buf, 1000) != 1000){
-       printf(1, "error: write aa %d new file failed\n", i);
-       exit();
-     }
-    
 }
