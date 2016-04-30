@@ -27,18 +27,18 @@ This version was made as part of an assignment at IIT Mandi, in Feb-June,2016
       a.  history.c
 
 ###Procedure to use:
-  1.  Use 
-  			```
-  			git clone https://github.com/sparsh99/xv6.git" 
-  			```
-			to clone to your local computer.
-  2.  Now try in the terminal,
-  			```
-        make
-        make qemu
-        ```
-      to run the system.
-  3.  Apart, from the features in the older version of xv6( of mit-pdos/xv6-public), a "history" command was added. This command can be tested after "make qemu" in xv6 terminal. Just type "history" and you can see the history.
+  1.  Use to clone to your local computer:
+  
+  	```
+  	git clone https://github.com/sparsh99/xv6.git
+  	```
+  	
+  2.  	Now try in the terminal: 
+  	`make`
+	and then,
+        `make qemu`
+        
+  3.	Apart, from the features in the older version of xv6( of mit-pdos/xv6-public), a `history` command was added. This command can be tested after `make qemu` in xv6 terminal. Just type `history` and you can see the history.
 
 ###Known issues:
 1.  In some computers, after cloning, make gives an error related to "mkfs" file. The solution to this issue is that delete the mkfs file, and perform "make" and "make qemu" again, and it would work.
